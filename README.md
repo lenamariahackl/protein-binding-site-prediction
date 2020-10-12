@@ -39,7 +39,7 @@ The files as well as the trained model are available in the log/ folder.
 ## Project description
 A CNN is trained on protein sequence data to predict the binding probability of a protein with classes metal / small / nuclear / peptide. Network weights are used to calculate class activation maps (CAMs) and thereby deduce residue-level information. Binding residues are predicted using a combination of protein-level prediction and the extracted CAMs. 
 
-`![network architecture](https://raw.githubusercontent.com/lenamariahackl/protein-binding-site-prediction/master/pic_net.png?token=AKYJGU3QHKPT3DATZY2N5T27QOVS4)`
+![network architecture](pic_net.png)
 (from [tensorflow-class-activation-mapping](https://github.com/philipperemy/tensorflow-class-activation-mapping))
 
 The implementation of the class activation maps is based on https://github.com/zhoubolei/CAM (the implementation of the [paper](http://cnnlocalization.csail.mit.edu/)).
