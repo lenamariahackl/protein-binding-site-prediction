@@ -38,6 +38,7 @@ The files as well as the trained model are available in the log/ folder.
 
 ## Troubleshooting
 In case of a `ModuleNotFoundError: No module named Bio` error, ensure that pip3 and python3 refer to the same python version.
+
 In case of a `RuntimeError: CUDA out of memory.` error, specify a smaller batchsize depending on your available memory as shown above.
 
 ## Project description
