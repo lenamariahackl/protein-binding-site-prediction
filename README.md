@@ -20,7 +20,7 @@ Instead train the network from scratch on custom data with
 ```
 python3 cam_seq.py -i your_input_data
 ```
-Be careful that the folder contains all input files like in the example_input_data folder.
+Make sure the folder contains all input files like in the example_input_data folder.
 
 Instead read in a pre-trained model to only make predictions on the test set with
 ```
