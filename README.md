@@ -12,7 +12,7 @@ pip3 install -r requirements.txt
 ```
 
 ## Example execution
-You can train the network from scratch on the example data with 
+You can train the network from scratch on the example data (parsed from [Biolib](https://zhanglab.ccmb.med.umich.edu/BioLiP/)) with 
 ```
 python3 cam_seq.py
 ```
