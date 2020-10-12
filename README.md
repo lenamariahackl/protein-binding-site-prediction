@@ -36,6 +36,9 @@ python3 cam_seq.py -l log
 ```
 The files as well as the trained model are available in the log/ folder.
 
+## Troubleshooting
+In case of a `ModuleNotFoundError: No module named Bio` error, ensure that pip3 and python3 refer to the same python version.
+
 ## Project description
 A CNN is trained on protein sequence data to predict the binding probability of a protein with classes metal / small / nuclear / peptide. Network weights are used to calculate class activation maps (CAMs) and thereby deduce residue-level information. Binding residues are predicted using a combination of protein-level prediction and the extracted CAMs. 
 
