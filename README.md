@@ -42,4 +42,4 @@ A CNN is trained on protein sequence data to predict the binding probability of 
 ![network architecture](pic_net.png)
 (from [tensorflow-class-activation-mapping](https://github.com/philipperemy/tensorflow-class-activation-mapping))
 
-The implementation of the class activation maps is based on https://github.com/zhoubolei/CAM (the implementation of this [paper](http://cnnlocalization.csail.mit.edu/)).
+The implementation of the class activation maps is based on https://github.com/zhoubolei/CAM (the implementation of [this paper](http://cnnlocalization.csail.mit.edu/)).
