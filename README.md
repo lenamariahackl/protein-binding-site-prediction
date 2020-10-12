@@ -3,7 +3,7 @@
 A Implementation of Class Activation maps to deduce residue-level binding prediction from a CNN.
 
 ## Setup
-For Python 3 but should also work for Python2 :)
+For Python 3 but should also work for Python 2 :)
 To run this project, install it locally using:
 ```
 git clone git@github.com:lenamariahackl/protein-binding-site-prediction.git
@@ -20,6 +20,8 @@ Instead train the network from scratch on custom data with
 ```
 python3 cam_seq.py -i your_input_data
 ```
+Be careful that the folder contains all input files like in the example_input_data folder.
+
 Instead read in a pre-trained model to only make predictions on the test set with
 ```
 python3 cam_seq.py -m pretrained.model
