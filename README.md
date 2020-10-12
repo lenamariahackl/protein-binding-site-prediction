@@ -26,7 +26,7 @@ Instead read in a pre-trained model to only make predictions on the test set wit
 ```
 python3 cam_seq.py -m pretrained.model
 ```
-Adjust the batch size with
+Adjust the train and valid batch size with
 ```
 python3 cam_seq.py -b 215
 ```
