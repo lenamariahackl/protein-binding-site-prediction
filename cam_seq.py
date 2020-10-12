@@ -194,9 +194,7 @@ def load_train_valid_data(data_path):
     input_file = os.path.join(data_path, "uniprot_train.fasta")
     seq_dict = SeqIO.to_dict(SeqIO.parse(input_file, "fasta"))
     for split in range(0, 5):
-        split_file = os.path.join(
-            data_path, ("ids_split" + str(split + 1) + ".txt")
-        )
+        split_file = os.path.join(data_path, ("ids_split" + str(split + 1) + ".txt"))
         txt_split = open(split_file)
         for i, txt_line in enumerate(txt_split):
             id_ = txt_line.rstrip("\n")
@@ -226,9 +224,7 @@ def pad_set(set_, max_length):
             (max_length, 21) with padding column (1 = data and 0 = padding)
     """
     aa_len = 20
-    padded_set = np.empty(
-        [len(set_), max_length, aa_len + 1], dtype=np.float16
-    )
+    padded_set = np.empty([len(set_), max_length, aa_len + 1], dtype=np.float16)
     for i, protein in enumerate(set_):
         diff = max_length - len(protein)
         new_set = np.append(protein, np.zeros((diff, aa_len))).reshape(
@@ -293,16 +289,14 @@ def load_testset(data_path, max_length, classes):
     seq_dict = SeqIO.to_dict(SeqIO.parse(input_file, "fasta"))
     x_test = [0] * len(seq_dict)
     for idx, protein_id in enumerate(y_test):
-        x_test[idx] = pad_set(
-            [aa_to_onehot(seq_dict[protein_id])], max_length
-        ).reshape((1000, 21))
+        x_test[idx] = pad_set([aa_to_onehot(seq_dict[protein_id])], max_length).reshape(
+            (1000, 21)
+        )
     # load y_test_bs in form {{[0,1,...,0]}}
     y_test_bs = {}
     for class_idx in range(len(classes)):
         label = open(
-            os.path.join(
-                data_path, f"binding_residues_{classes[class_idx]}.txt"
-            )
+            os.path.join(data_path, f"binding_residues_{classes[class_idx]}.txt")
         )
         bs_labels = {}
         for line in label:
@@ -323,9 +317,7 @@ def load_testset(data_path, max_length, classes):
                 y_test_bs[idx][class_idx] = np.array(new_bs)
             else:
                 y_test_bs[idx][class_idx] = y_test_bs[idx].get(class_idx, [])
-                y_test_bs[idx][class_idx] = np.zeros(
-                    len(x_AA_seq), dtype=np.int
-                )
+                y_test_bs[idx][class_idx] = np.zeros(len(x_AA_seq), dtype=np.int)
     ids_test = list(seq_dict.keys())
     return ids_test, x_test, list(y_test.values()), seq_dict, y_test_bs
 
@@ -551,15 +543,13 @@ def calc_CAMs(x, model, classes):
         weight_softmax_params = list(
             model._modules.get("fc").parameters()
         )  # out parameters after average pooling
-        weight_softmax = np.squeeze(
-            weight_softmax_params[0].cpu().data.numpy()
-        )
+        weight_softmax = np.squeeze(weight_softmax_params[0].cpu().data.numpy())
         norms = []
         nonnorms = []
         len_ = int(
-            x[0][20].sum().numpy()
+            x[0][20].cpu().sum().numpy()
         )  # residues where padding column 1 = length of non-padded protein
-        feature_conv = activated_features.features
+        feature_conv = activated_features.act_features
         for class_idx in range(len(classes)):
             _, nc, h, w = feature_conv.shape
             nonnorm_CAM = np.dot(
@@ -655,12 +645,12 @@ def write_to_file(path, name, current_time, comments, preds, classes):
     classes : array
             the classes that should be predicted
     """
-    file = Path(os.path.join(path, (f"{current_time}_{name}.txt")))
-    if not file.is_file():
+    file = os.path.join(path, (f"{current_time}_{name}.txt"))
+    if not os.path.exists(file):
         with open(file, "a") as f:
             f.write(
                 (
-                    f'{comments}, format: protein_id '
+                    f"{comments}, format: protein_id "
                     f'{" ".join(str(c) for c in classes)}\n'
                 )
             )
@@ -669,9 +659,7 @@ def write_to_file(path, name, current_time, comments, preds, classes):
             f.write(f"{protein_id}")
             for class_id, class_ in enumerate(classes):
                 if isinstance(protein_preds[class_id], Iterable):
-                    data = ",".join(
-                        str(val) for val in protein_preds[class_id]
-                    )
+                    data = ",".join(str(val) for val in protein_preds[class_id])
                 else:
                     data = protein_preds[class_id]
                 f.write(f"\n{data}")
@@ -689,22 +677,16 @@ class MyArchitecture(nn.Module):
         kernel = (1, 5)
         pad = (0, 2)
         self.conv_1 = nn.Sequential(
-            nn.Conv2d(
-                nr_channels, hidden, kernel_size=kernel, stride=1, padding=pad
-            ),
+            nn.Conv2d(nr_channels, hidden, kernel_size=kernel, stride=1, padding=pad),
             nn.ELU(),
             nn.Dropout2d(),
         )
         self.conv_2 = nn.Sequential(
-            nn.Conv2d(
-                hidden, hidden, kernel_size=kernel, stride=1, padding=pad
-            ),
+            nn.Conv2d(hidden, hidden, kernel_size=kernel, stride=1, padding=pad),
             nn.ELU(),
             nn.Dropout2d(),
         )
-        self.conv = nn.Conv2d(
-            hidden, hidden, kernel_size=kernel, stride=1, padding=pad
-        )
+        self.conv = nn.Conv2d(hidden, hidden, kernel_size=kernel, stride=1, padding=pad)
         self.aavg = nn.AdaptiveAvgPool2d((1, 1))
         self.fc = nn.Linear(hidden, output)
 
@@ -758,16 +740,12 @@ def main(logging, log_path, pretrained, model_path, input_path, batchsize):
         )
         weights = torch.Tensor([2.9191, 2.0739, 11.0989, 11.7442]).to(device)
         pos_weight = torch.Tensor([1.4855, 0.7659, 8.4505, 9.0000]).to(device)
-        criterion = torch.nn.BCEWithLogitsLoss(
-            reduction="none", pos_weight=pos_weight
-        )
+        criterion = torch.nn.BCEWithLogitsLoss(reduction="none", pos_weight=pos_weight)
         optimizer = optim.Adam(model.parameters(), lr=lr)
         optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
         epochs = checkpoint["epoch"]
         dt = str(datetime.datetime.now())
-        curr_time = (
-            f"{dt[5:10]}-{str(int(dt[11:13])+2)}-{dt[14:16]}-{dt[17:19]}"
-        )
+        curr_time = f"{dt[5:10]}-{str(int(dt[11:13])+2)}-{dt[14:16]}-{dt[17:19]}"
         comments = (
             f"{curr_time}: lr={lr}, weights={weights.cpu()},"
             f" {epochs} epochs, {nr_hyperparams} hyperparams"
@@ -798,17 +776,13 @@ def main(logging, log_path, pretrained, model_path, input_path, batchsize):
             nr_hyperparams = sum(
                 [
                     np.prod(p.size())
-                    for p in filter(
-                        lambda p: p.requires_grad, model.parameters()
-                    )
+                    for p in filter(lambda p: p.requires_grad, model.parameters())
                 ]
             )
             optimizer = optim.Adam(model.parameters(), lr=lr)
             model.to(device)
             dt = str(datetime.datetime.now())
-            curr_time = (
-                f"{dt[5:10]}-{str(int(dt[11:13])+2)}-{dt[14:16]}-{dt[17:19]}"
-            )
+            curr_time = f"{dt[5:10]}-{str(int(dt[11:13])+2)}-{dt[14:16]}-{dt[17:19]}"
             comments = (
                 f"{curr_time}: lr={lr}, bs(T/V)={batch_size_train}"
                 f"/{batch_size_valid}, weights={weights.cpu()}, {epochs}"
@@ -832,21 +806,17 @@ def main(logging, log_path, pretrained, model_path, input_path, batchsize):
                 train_loss = train(
                     train_loader, model, criterion, optimizer, device, weights
                 )
-                valid_loss = valid(
-                    valid_loader, model, criterion, device, weights
-                )
+                valid_loss = valid(valid_loader, model, criterion, device, weights)
             if logging:
                 state = {
                     "epoch": epoch,
                     "model_state_dict": model.state_dict(),
                     "optimizer_state_dict": optimizer.state_dict(),
                 }
-                torch.save(
-                    state, os.path.join(log_path, (f"{str(curr_time)}_model"))
-                )
+                torch.save(state, os.path.join(log_path, (f"{str(curr_time)}_model")))
 
     print("Calculate CAM on test data.")
-    batch_size_test = batchsize if batchsize else 300
+    batch_size_test = 1
     ids_test, x_test, y_test, seq_dict, y_bs_test = load_testset(
         input_path, max_length, classes
     )
@@ -882,14 +852,10 @@ if __name__ == "__main__":
         "--input",
         help="path to the input data folder (default: /example_input_data)",
     )
+    parser.add_argument("-m", "--model", help="load pretrained model from file")
+    parser.add_argument("-l", "--log", help="log model and predictions to folder")
     parser.add_argument(
-        "-m", "--model", help="load pretrained model from file"
-    )
-    parser.add_argument(
-        "-l", "--log", help="log model and predictions to folder"
-    )
-    parser.add_argument(
-        "-b", "--batchsize", help="set batchsize for training and evaluation"
+        "-b", "--batchsize", help="set batchsize for training and validation"
     )
     args = parser.parse_args()
 
